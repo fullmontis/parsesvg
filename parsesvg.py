@@ -11,6 +11,7 @@
 # TODO: update HTML part (which is buggy and unchecked)
 #
 # Usage: parse_svg [inkscape svg] [--to-html|--to-json] [--required-names]
+#        [--export-png]
 
 import xml.etree.ElementTree as ET
 import sys
@@ -23,9 +24,13 @@ svg = "{http://www.w3.org/2000/svg}"
 inkscape = "{http://www.inkscape.org/namespaces/inkscape}"
 
 svgname = sys.argv[1]
-namerequired = false
+namerequired = False
+exportpng = False
 if sys.argv[3] == "--required-names":
-    namerequired = true
+    namerequired = True
+if sys.argv[4] == "--export-png":
+    exportpng = True
+
 xmldoc = ET.parse(svgname)
 root = xmldoc.getroot()
 # parse width and height to int
@@ -109,7 +114,7 @@ else:
                 if( type(itemname).__name__ == 'NoneType' ):
                     sys.exit('\n*** ERROR: Item '+itemid+
                              ' has no defined NAME attribute, aborting...')
-                else:
+            else:
                 print('\n!!! WARNING: Item '+itemid+
                       ' has no defined NAME attribute')
                 print('!!! Setting it to ""\n')
@@ -151,9 +156,10 @@ else:
             xmlfile.write("\n")
 
             # export to png
-            print('-> EXPORTING item '+itemid+'...\n' )
-            os.system("inkscape "+svgname+" --export-id "+itemid+
-                      " --export-id-only -e"+filename+".png")
+            if exportpng:
+                print('-> EXPORTING item '+itemid+'...\n' )
+                os.system("inkscape "+svgname+" --export-id "+itemid+
+                          " --export-id-only -e"+filename+".png")
 
         xmlfile.write('] }')
         xmlfile.close()
